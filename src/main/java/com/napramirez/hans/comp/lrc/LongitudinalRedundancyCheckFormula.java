@@ -14,12 +14,13 @@ public class LongitudinalRedundancyCheckFormula implements Formula
 
     public Result calculate(String input)
     {
-        byte[] inputBytes = input.getBytes();
         byte checksum = 0;
 
-        for (int i = 0; i < inputBytes.length; i++)
+        for (int i = 0; i < input.length(); i++)
         {
-            checksum = (byte) ((checksum + inputBytes[i]) & 0xFF);
+            byte b = (byte) (Character.getNumericValue(input.charAt(i)) & 0xFF);
+
+            checksum = (byte) ((checksum + b) & 0xFF);
         }
 
         checksum = (byte) (((checksum ^ 0xFF) + 1) & 0xFF);
