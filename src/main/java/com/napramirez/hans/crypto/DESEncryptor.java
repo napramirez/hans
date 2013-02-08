@@ -28,9 +28,14 @@ public class DESEncryptor implements Encryptor
 
     public DESEncryptor() throws EncryptionException
     {
+        this(false);
+    }
+
+    public DESEncryptor(boolean pad) throws EncryptionException
+    {
         try
         {
-            cipher = Cipher.getInstance("DES/ECB/NoPadding");
+            cipher = Cipher.getInstance("DES/ECB/" + (pad ? "PKCS5Padding" : "NoPadding"));
             secretKeyFactory = SecretKeyFactory.getInstance("DES");
         }
         catch (NoSuchAlgorithmException e)
