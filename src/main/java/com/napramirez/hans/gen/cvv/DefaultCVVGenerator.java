@@ -7,6 +7,7 @@ import com.napramirez.hans.crypto.HexKey;
 import com.napramirez.hans.crypto.TripleDESEncryptor;
 import com.napramirez.hans.gen.GenerationException;
 import com.napramirez.hans.util.DecUtil;
+import com.napramirez.hans.util.HexKeyUtil;
 import com.napramirez.hans.util.HexUtil;
 import com.napramirez.hans.util.StringPaddingUtil;
 
@@ -40,9 +41,9 @@ public class DefaultCVVGenerator implements CVVGenerator
         String result;
         try
         {
-            result = encryptor.encrypt(new DESKey(hexKey1), blockA);
+            result = encryptor.encrypt(new DESKey(hexKey1.toString()), blockA);
             result = HexUtil.INSTANCE.xor(result, blockB);
-            result = encryptor.encrypt(new DESKey(hexKey1, hexKey2), result);
+            result = encryptor.encrypt(HexKeyUtil.INSTANCE.add(hexKey1, hexKey2), result);
         }
         catch (EncryptionException e)
         {
