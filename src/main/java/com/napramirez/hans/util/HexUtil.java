@@ -48,6 +48,36 @@ public enum HexUtil
         return sb.toString();
     }
 
+    public String addMod16(String a, String b)
+    {
+        if (a == null || a.length() == 0)
+        {
+            throw new IllegalArgumentException("Hex string '" + a + "' cannot be empty!");
+        }
+
+        if (b == null || b.length() == 0)
+        {
+            throw new IllegalArgumentException("Hex string '" + b + "' cannot be empty!");
+        }
+
+        if (a.length() != b.length())
+        {
+            throw new IllegalArgumentException("Input strings must be of the same length!");
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < a.length(); i++)
+        {
+            int intA = toInt(a.charAt(i));
+            int intB = toInt(b.charAt(i));
+            int result = (intA + intB) % 16;
+            sb.append(toHexDigit(result));
+        }
+
+        return sb.toString();
+    }
+
     public int toInt(char c)
     {
         String cString = String.valueOf(c).toUpperCase();

@@ -21,21 +21,6 @@ public class DESKey implements HexKey
 
     private byte[] bytes;
 
-    public DESKey(HexKey hexKey)
-    {
-        this(hexKey.toString());
-    }
-
-    public DESKey(HexKey hexKey1, HexKey hexKey2)
-    {
-        this(hexKey1.toString() + hexKey2.toString());
-    }
-
-    public DESKey(HexKey hexKey1, HexKey hexKey2, HexKey hexKey3)
-    {
-        this(hexKey1.toString() + hexKey2.toString() + hexKey3.toString());
-    }
-
     public DESKey(byte[] bytes)
     {
         this(new String(bytes));
