@@ -15,8 +15,8 @@
     </prerequisites>
 
     <scm>
-        <connection>scm:git:ssh://git@github.com:napramirez/hans.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com:napramirez/hans.git</developerConnection>
+        <connection>scm:git:ssh://git@github.com/napramirez/hans.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/napramirez/hans.git</developerConnection>
         <url>https://github.com/napramirez/hans</url>
     </scm>
 
