@@ -3,7 +3,7 @@
 
     <groupId>com.napramirez.hans</groupId>
     <artifactId>hans</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
 
     <name>Hans</name>
     <description>Bank Card Tools</description>
