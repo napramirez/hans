@@ -1,7 +1,6 @@
 package com.napramirez.hans.gen.pin;
 
 import com.napramirez.hans.crypto.DESEncryptor;
-import com.napramirez.hans.crypto.DESKey;
 import com.napramirez.hans.crypto.EncryptionException;
 import com.napramirez.hans.crypto.Encryptor;
 import com.napramirez.hans.crypto.HexKey;
