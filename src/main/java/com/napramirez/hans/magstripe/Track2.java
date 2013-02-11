@@ -9,6 +9,10 @@ public class Track2
 {
     public static final int MAX_LENGTH = 40;
 
+    public static final int LENGTH_EXPIRY_DATE = 4;
+
+    public static final int LENGTH_SERVICE_CODE = 3;
+
     public static final String STX = ";";
 
     public static final String FS = "=";
@@ -17,41 +21,43 @@ public class Track2
 
     public static final String ESC = "\\";
 
-    public static final String REGEX_PAN = "[0-9]{0,19}";
+    public static final String REGEX_FS = ESC + FS;
 
-    public static final String REGEX_EXPIRY = "([0-9]{4}" + "|" + ESC + FS + ")";
+    public static final String REGEX_PAN = "[0-9]{1,19}";
 
-    public static final String REGEX_SERVICE_CODE = "([0-9]{3}" + "|" + ESC + FS + ")";
+    public static final String REGEX_EXPIRY = "([0-9]{4}" + "|" + REGEX_FS + ")";
 
-    public static final String REGEX_DISCRETIONARY_DATA = "[0-9]{0,34}";
+    public static final String REGEX_SERVICE_CODE = "([0-9]{3}" + "|" + REGEX_FS + ")";
 
-    public static final String REGEX_LRC = ".";
+    public static final String REGEX_DISCRETIONARY_DATA = "[0-9]*";
 
-    public static final String REGEX = "^" + ESC + STX + REGEX_PAN + ESC + FS + REGEX_EXPIRY + REGEX_SERVICE_CODE + REGEX_DISCRETIONARY_DATA + ESC + ETX
+    public static final String REGEX_LRC = ".?";
+
+    public static final String REGEX = "^" + ESC + STX + REGEX_PAN + REGEX_FS + REGEX_EXPIRY + REGEX_SERVICE_CODE + REGEX_DISCRETIONARY_DATA + ESC + ETX
             + REGEX_LRC + "$";
 
     /**
-     * 0-19 digits
+     * 1-19 digits
      */
     private String pan;
 
     /**
-     * 4 digits YYMM
+     * 4 digits YYMM, nullable
      */
     private String expirationDate;
 
     /**
-     * 3 digits
+     * 3 digits, nullable
      */
     private String serviceCode;
 
     /**
-     * balance of available digits
+     * balance of available digits, nullable
      */
     private String discretionaryData;
 
     /**
-     * 1 character
+     * 1 character, nullable
      */
     private String lrc;
 
@@ -61,9 +67,9 @@ public class Track2
 
     public Track2(String track2String)
     {
-        if (track2String == null || track2String.trim().isEmpty())
+        if (track2String == null)
         {
-            throw new IllegalArgumentException("Track2 string cannot be null or empty!");
+            throw new NullPointerException("Track2 string cannot be null!");
         }
 
         if (track2String.length() > MAX_LENGTH)
@@ -73,40 +79,31 @@ public class Track2
 
         if (!track2String.matches(REGEX))
         {
-            throw new IllegalArgumentException("Invalid track2 string!");
+            throw new IllegalArgumentException("Invalid Track2 format for: " + REGEX);
         }
 
         StringBuilder sb = new StringBuilder(track2String);
 
         sb.deleteCharAt(0); // delete STX
 
-        if (!FS.equals(String.valueOf(sb.charAt(0)))) // check if pan exists
+        int indexOfPanFS = sb.indexOf(FS);
+        pan = sb.substring(0, indexOfPanFS);
+        sb.delete(0, indexOfPanFS + 1); // consume token and delimiter
+
+        if (!FS.equals(String.valueOf(sb.charAt(0))))
         {
-            int indexOfFS = sb.indexOf(FS);
-            pan = sb.substring(0, indexOfFS);
-            sb.delete(0, indexOfFS + 1); // consume token and delimiter
+            expirationDate = sb.substring(0, LENGTH_EXPIRY_DATE);
+            sb.delete(0, LENGTH_EXPIRY_DATE);
         }
         else
         {
             sb.deleteCharAt(0);
         }
 
-        int expirationDateLength = 4;
         if (!FS.equals(String.valueOf(sb.charAt(0))))
         {
-            expirationDate = sb.substring(0, expirationDateLength);
-            sb.delete(0, expirationDateLength);
-        }
-        else
-        {
-            sb.deleteCharAt(0);
-        }
-
-        int serviceCodeLength = 3;
-        if (!FS.equals(String.valueOf(sb.charAt(0))))
-        {
-            serviceCode = sb.substring(0, serviceCodeLength);
-            sb.delete(0, serviceCodeLength);
+            serviceCode = sb.substring(0, LENGTH_SERVICE_CODE);
+            sb.delete(0, LENGTH_SERVICE_CODE);
         }
         else
         {
@@ -117,7 +114,10 @@ public class Track2
         discretionaryData = sb.substring(0, indexOfETX);
         sb.delete(0, indexOfETX + 1);
 
-        lrc = sb.substring(0, 1);
+        if (sb.length() > 0)
+        {
+            lrc = sb.substring(0, 1);
+        }
     }
 
     public String getPan()
@@ -127,6 +127,16 @@ public class Track2
 
     public void setPan(String pan)
     {
+        if (pan == null)
+        {
+            throw new NullPointerException("PAN cannot be null!");
+        }
+
+        if (!pan.matches(REGEX_PAN))
+        {
+            throw new IllegalArgumentException("Invalid PAN format for: " + REGEX_PAN);
+        }
+
         this.pan = pan;
     }
 
@@ -137,6 +147,16 @@ public class Track2
 
     public void setExpirationDate(String expirationDate)
     {
+        if (expirationDate != null && !expirationDate.matches(REGEX_EXPIRY))
+        {
+            throw new IllegalArgumentException("Invalid Expiration Date format for: " + REGEX_EXPIRY);
+        }
+
+        if (expirationDate.equals(FS))
+        {
+            throw new IllegalArgumentException("Invalid Expiration Date value: " + expirationDate);
+        }
+
         this.expirationDate = expirationDate;
     }
 
@@ -147,6 +167,16 @@ public class Track2
 
     public void setServiceCode(String serviceCode)
     {
+        if (serviceCode != null && !serviceCode.matches(REGEX_SERVICE_CODE))
+        {
+            throw new IllegalArgumentException("Invalid Service Code format for: " + REGEX_SERVICE_CODE);
+        }
+
+        if (serviceCode.equals(FS))
+        {
+            throw new IllegalArgumentException("Invalid Service Code value: " + serviceCode);
+        }
+
         this.serviceCode = serviceCode;
     }
 
@@ -157,6 +187,11 @@ public class Track2
 
     public void setDiscretionaryData(String discretionaryData)
     {
+        if (discretionaryData != null && !discretionaryData.matches(REGEX_DISCRETIONARY_DATA))
+        {
+            throw new IllegalArgumentException("Invalid Discretionary Data format for: " + REGEX_DISCRETIONARY_DATA);
+        }
+
         this.discretionaryData = discretionaryData;
     }
 
@@ -167,32 +202,12 @@ public class Track2
 
     public void setLrc(String lrc)
     {
+        if (lrc != null && !lrc.matches(REGEX_LRC))
+        {
+            throw new IllegalArgumentException("Invalid LRC format for: " + REGEX_LRC);
+        }
+
         this.lrc = lrc;
-    }
-
-    public static int getMaxLength()
-    {
-        return MAX_LENGTH;
-    }
-
-    public static String getStx()
-    {
-        return STX;
-    }
-
-    public static String getFs()
-    {
-        return FS;
-    }
-
-    public static String getEtx()
-    {
-        return ETX;
-    }
-
-    private String computeLRC()
-    {
-        return "*";
     }
 
     @Override
@@ -202,17 +217,32 @@ public class Track2
 
         sb.append(STX);
 
-        if (pan != null && !pan.trim().isEmpty())
+        if (pan == null)
         {
-            sb.append(pan);
+            throw new NullPointerException("PAN cannot be null!");
         }
+        sb.append(pan);
         sb.append(FS);
 
         sb.append(expirationDate != null && !expirationDate.trim().isEmpty() ? expirationDate : FS);
         sb.append(serviceCode != null && !serviceCode.trim().isEmpty() ? serviceCode : FS);
 
+        if (discretionaryData != null)
+        {
+            sb.append(discretionaryData);
+        }
+
         sb.append(ETX);
-        sb.append(computeLRC());
+
+        if (lrc != null)
+        {
+            sb.append(lrc);
+        }
+
+        if (sb.length() > MAX_LENGTH)
+        {
+            throw new StringIndexOutOfBoundsException(sb.length());
+        }
 
         return sb.toString();
     }

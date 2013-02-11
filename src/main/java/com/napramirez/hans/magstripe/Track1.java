@@ -225,7 +225,7 @@ public class Track1
     {
         if (discretionaryData != null && !discretionaryData.matches(REGEX_DISCRETIONARY_DATA))
         {
-            throw new IllegalArgumentException("Invalid Discretionary Data format for: " + REGEX_SERVICE_CODE);
+            throw new IllegalArgumentException("Invalid Discretionary Data format for: " + REGEX_DISCRETIONARY_DATA);
         }
 
         this.discretionaryData = discretionaryData;
