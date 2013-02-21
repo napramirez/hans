@@ -24,13 +24,13 @@ public class SequentialCardNumberGenerator implements CardNumberGenerator
         this(0, verifier);
     }
 
-    public SequentialCardNumberGenerator(int startingNumber, CardNumberVerifier verifier)
+    public SequentialCardNumberGenerator(long startingNumber, CardNumberVerifier verifier)
     {
         reset(startingNumber);
         this.verifier = verifier;
     }
 
-    public void reset(int start)
+    public void reset(long start)
     {
         counter = start;
     }
@@ -64,7 +64,7 @@ public class SequentialCardNumberGenerator implements CardNumberGenerator
             String currentNumberString = String.valueOf(currentNumber);
             if (currentNumberString.length() > length - prefix.length())
             {
-                currentNumberString = currentNumberString.substring(currentNumberString.length() - (length - prefix.length()));
+                throw new GenerationException("Card number length exceeded!");
             }
 
             String cardNumber = prefix + StringPaddingUtil.INSTANCE.padLeft(currentNumberString, DEFAULT_PADDING_CHARACTER, length - prefix.length());
